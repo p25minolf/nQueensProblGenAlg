@@ -194,3 +194,7 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+/nQueensProblem/nQueensProblem.vcxproj.filters
+/nQueensProblem.sln
+/nQueensProblem/nQueensProblem.vcxproj
+/nQueensProblem/ReadMe.txt
