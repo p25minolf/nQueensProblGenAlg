@@ -140,20 +140,19 @@ int Population ::ChessBoard::fnCheck() {
 			int counter = 1;
                 for(size_t j = i+1; j < m_boardSize; j++) {
 					int testPos = m_rgQueenPositions[j];
-                        if(m_rgQueenPositions[i] == m_rgQueenPositions[j]) {
+                        if(pos == testPos) {
                                 i_cFitCount++;
-
-								if (pos == testPos + counter)
-								{
-									i_cFitCount++;
-								}
-
-								if (pos == testPos - counter)
-								{
-									i_cFitCount++;
-								}
-								counter++;
                         }
+						if (pos == testPos + counter)
+						{
+							i_cFitCount++;
+						}
+
+						if (pos == testPos - counter)
+						{
+							i_cFitCount++;
+						}
+						counter++;
                 }
         }
 
@@ -229,6 +228,18 @@ std::ostream& Population ::print(std::ostream& o) const {
                         o << m_rgcbPopulation[i]->m_rgQueenPositions[j] << ' ';
                 } o << ']' << '\n';
         }
+		for (size_t i = 0; i < m_boardSize; i++)
+		{
+			
+			for (size_t j = 0; j < m_boardSize; j++)
+			{
+				if (m_rgcbPopulation[0]->m_rgQueenPositions[i] == j)
+					o << 1<<" ";
+				else
+					o << 0<<" ";
+			}
+			o<< std::endl;
+		}
 
         return o;
 }
