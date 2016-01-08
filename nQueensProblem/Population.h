@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <ctime>
 
 /*
  * Class defines Population for the algorithm;
@@ -164,12 +165,26 @@ int Population ::ChessBoard::fnCheckDiag() {
         int i_cFitCountDiag = 0;
 
         for(size_t i = 0; i < m_boardSize; i++) {
-                for(size_t j = 0; j < m_boardSize; j++) {
-						if (m_rgQueenPositions[i] == m_rgQueenPositions[j] + j  || m_rgQueenPositions[i] == m_rgQueenPositions[j] - j)
-						{
-						//	i_cFitCountDiag++; 
-						}
-                }
+			int pos = m_rgQueenPositions[i];
+			int counter = 1;
+			for (size_t k = i + 1; k < m_boardSize; k++)
+			{
+				
+					int testPos = m_rgQueenPositions[k];
+					if (pos == testPos + counter)
+					{
+						i_cFitCountDiag++;
+					}
+
+					if (pos == testPos - counter)
+					{
+						i_cFitCountDiag++;
+					}
+					counter++;
+				
+			}
+
+
         }
 
         return i_cFitCountDiag;
@@ -180,6 +195,8 @@ int Population ::ChessBoard::fnCheckDiag() {
 
  
 void Population ::fnMutatePop() {
+
+
 	for (size_t i = m_bestPop; i < m_cPopulationCount; i++)
 	{
 		size_t randGen = rand() % m_boardSize;
@@ -189,6 +206,8 @@ void Population ::fnMutatePop() {
 
  
 void Population ::fnCrossoverPop() {
+
+
 	for (size_t i = 0; i < m_cPopulationCount - m_bestPop; i++)
 	{
 		size_t rand1 = rand() % m_cPopulationCount;
@@ -219,6 +238,7 @@ void Population::fnInitCycle()
 {
 	while (m_rgcbPopulation[0]->m_iFitness < 0)
 	{
+		srand(time(NULL));
 		fnCrossoverPop();
 		fnMutatePop();
 		fnRateFitness();
