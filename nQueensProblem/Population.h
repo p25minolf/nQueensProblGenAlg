@@ -30,13 +30,6 @@ struct ChessBoard {
 		}
 	}
 
-	ChessBoard::ChessBoard(ChessBoard& rhs)
-	{
-		m_boardSize = rhs.m_boardSize;
-		m_rgQueenPositions = rhs.m_rgQueenPositions;
-		m_iFitness = rhs.m_iFitness;
-	}
-
 	ChessBoard::~ChessBoard()
 	{
 		delete m_rgQueenPositions;
@@ -127,7 +120,7 @@ void Population ::fnRateFitness() {
 			{
 				if (m_rgcbPopulation[i]->m_iFitness < m_rgcbPopulation[j]->m_iFitness)
 				{
-					ChessBoard* temp = new ChessBoard(*m_rgcbPopulation[i]);
+					ChessBoard* temp = m_rgcbPopulation[i];
 					m_rgcbPopulation[i] = m_rgcbPopulation[j];
 					m_rgcbPopulation[j] = temp;
 				}
@@ -233,13 +226,16 @@ void Population ::fnCrossoverPop() {
 
 void Population::fnInitCycle()
 {
+	int counter = 1;
 	while (m_rgcbPopulation[0]->m_iFitness < 0)
 	{
 		srand(time(NULL));
 		fnCrossoverPop();
 		fnMutatePop();
 		fnRateFitness();
+		counter++;
 	}
+	std::cout << "cycle: " << counter;
 }
 
 std::ostream& Population ::print(std::ostream& o) const {
