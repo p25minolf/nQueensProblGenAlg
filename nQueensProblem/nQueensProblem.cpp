@@ -7,8 +7,10 @@
 #include "Population.h"
 
 int main() {
-
-        Population* p = new Population(200, 8);
+		
+	size_t n = 18;
+	size_t pop = n * 25;
+        Population* p = new Population(pop, n);
         /*const char helpStr[] =
            "This is a Helperstr\n"
            "It is here to help.\n";

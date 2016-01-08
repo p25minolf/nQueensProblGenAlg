@@ -44,11 +44,10 @@ struct ChessBoard {
          * Function to set the fitness var
          */
         void fnCheckFitness() {
-                m_iFitness -= fnCheckRow() + fnCheckDiag();
+			m_iFitness -= fnCheck();
         }
 
-        int fnCheckRow();
-        int fnCheckDiag(); // TODO: combine with fnCheckRow; OR use Threads?
+        int fnCheck();
 
 };
 
@@ -98,7 +97,7 @@ Population ::Population(size_t ucInitialPopSize, size_t boardsize) {
                 //m_cPopulationCount++;
         }
         m_cPopulationCount = ucInitialPopSize;
-		m_bestPop = m_cPopulationCount / 4;
+		m_bestPop = 2;
 		fnRateFitness();
 		fnInitCycle();
         std::cout << ucInitialPopSize << std::endl;
@@ -133,52 +132,34 @@ void Population ::fnRateFitness() {
  * Checks if a queen is the only one in a vertical/horizontal row
  * counter to modify fitness var in Individuals
  */
-int Population ::ChessBoard::fnCheckRow() {
-        int i_cFitCountRow = 0;
-
-        for(size_t i = 0; i < m_boardSize; i++) {
-                for(size_t j = i+1; j < m_boardSize; j++) {
-                        if(m_rgQueenPositions[i] == m_rgQueenPositions[j]) {
-                                i_cFitCountRow++;
-                        }
-                }
-        }
-
-        return i_cFitCountRow;
-}
-
-/*
- * Checks if a queen is the only one in a diagonal row
- * counter to modify fitness var in Individuals
- */
-int Population ::ChessBoard::fnCheckDiag() {
-        int i_cFitCountDiag = 0;
+int Population ::ChessBoard::fnCheck() {
+        int i_cFitCount = 0;
 
         for(size_t i = 0; i < m_boardSize; i++) {
 			int pos = m_rgQueenPositions[i];
 			int counter = 1;
-			for (size_t k = i + 1; k < m_boardSize; k++)
-			{
-				
-					int testPos = m_rgQueenPositions[k];
-					if (pos == testPos + counter)
-					{
-						i_cFitCountDiag++;
-					}
+                for(size_t j = i+1; j < m_boardSize; j++) {
+					int testPos = m_rgQueenPositions[j];
+                        if(m_rgQueenPositions[i] == m_rgQueenPositions[j]) {
+                                i_cFitCount++;
 
-					if (pos == testPos - counter)
-					{
-						i_cFitCountDiag++;
-					}
-					counter++;
-				
-			}
+								if (pos == testPos + counter)
+								{
+									i_cFitCount++;
+								}
 
-
+								if (pos == testPos - counter)
+								{
+									i_cFitCount++;
+								}
+								counter++;
+                        }
+                }
         }
 
-        return i_cFitCountDiag;
+        return i_cFitCount;
 }
+
 
  
 
