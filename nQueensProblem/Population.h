@@ -120,13 +120,12 @@ void Population ::fnRateFitness() {
     std::cout << m_cPopulationCount << std::endl;
 
         for(size_t i = 0; i < m_cPopulationCount; i++) {
-            std::cout << m_rgcbPopulation[i]->m_iFitness << std::endl;
-            std::cout << i << std::endl;
+			m_rgcbPopulation[i]->m_iFitness = 0;
             m_rgcbPopulation[i]->fnCheckFitness();
         }
 		for (size_t i = 0; i < m_cPopulationCount; i++)
 		{
-			for (size_t j = i; j < m_cPopulationCount; j++)
+			for (size_t j = i+1; j < m_cPopulationCount; j++)
 			{
 				if (m_rgcbPopulation[i]->m_iFitness < m_rgcbPopulation[j]->m_iFitness)
 				{
@@ -147,7 +146,7 @@ int Population ::ChessBoard::fnCheckRow() {
         int i_cFitCountRow = 0;
 
         for(size_t i = 0; i < m_boardSize; i++) {
-                for(size_t j = i+1; j < m_boardSize-i; j++) {
+                for(size_t j = i+1; j < m_boardSize; j++) {
                         if(m_rgQueenPositions[i] == m_rgQueenPositions[j]) {
                                 i_cFitCountRow++;
                         }
@@ -165,7 +164,7 @@ int Population ::ChessBoard::fnCheckDiag() {
         int i_cFitCountDiag = 0;
 
         for(size_t i = 0; i < m_boardSize; i++) {
-                for(size_t j = i+1; j < m_boardSize-i; j++) {
+                for(size_t j = i+1; j < m_boardSize; j++) {
                         if(m_rgQueenPositions[j] == m_rgQueenPositions[i]+j || m_rgQueenPositions[j] == m_rgQueenPositions[i]-j) {
                                 i_cFitCountDiag++;
                         }
@@ -180,12 +179,16 @@ int Population ::ChessBoard::fnCheckDiag() {
 
  
 void Population ::fnMutatePop() {
-
+	for (size_t i = m_bestPop; i < m_cPopulationCount; i++)
+	{
+		size_t randGen = rand() % m_boardSize;
+		m_rgcbPopulation[i]->m_rgQueenPositions[randGen] = rand() % m_boardSize;
+	}
 }
 
  
 void Population ::fnCrossoverPop() {
-
+	
 }
 
 void Population::fnInitCycle()
