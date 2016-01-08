@@ -16,12 +16,17 @@ class Population {
  */
 struct ChessBoard {
 
-
+	/*
+	* Constructor - Randomizes position of queens
+	*/
 	ChessBoard::ChessBoard(size_t board)
 	{
 		boardSize = board;
 		m_rgQueenPositions = new int[boardSize];
-
+		m_iFitness = 0;
+		for (size_t i = 0; i < boardSize; i++) {
+			m_rgQueenPositions[i] = rand() % boardSize;
+		}
 	}
 
 	ChessBoard::~ChessBoard()
@@ -31,15 +36,8 @@ struct ChessBoard {
         int m_iFitness;
 		size_t boardSize;
 		int *m_rgQueenPositions;
-        /*
-         * Constructor - Randomizes position of queens
-         */
-        ChessBoard() {
-                m_iFitness = 0;
-                for(size_t i = 0; i < boardSize; i++) {
-                        m_rgQueenPositions[i] = rand() % boardSize;
-                }
-        }
+
+
 
         /*
          * Function to set the fitness var
