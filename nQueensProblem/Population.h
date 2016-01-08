@@ -51,9 +51,7 @@ struct ChessBoard {
          * Function to set the fitness var
          */
         void fnCheckFitness() {
-                std::cout << m_iFitness << std::endl;
                 m_iFitness -= fnCheckRow() + fnCheckDiag();
-                std::cout << m_iFitness << std::endl;
         }
 
         int fnCheckRow();
@@ -118,7 +116,6 @@ Population ::Population(size_t ucInitialPopSize, size_t boardsize) {
  */
 void Population ::fnRateFitness() {
 
-    std::cout << m_cPopulationCount << std::endl;
 
         for(size_t i = 0; i < m_cPopulationCount; i++) {
 			m_rgcbPopulation[i]->m_iFitness = 0;
@@ -247,7 +244,7 @@ void Population::fnInitCycle()
 
 std::ostream& Population ::print(std::ostream& o) const {
         o << "Population, N = " << m_boardSize << ", popCount = " << m_cPopulationCount <<  '\n';
-        for(size_t i = 0; i < m_cPopulationCount; i++) {
+        for(size_t i = 0; i < 1; i++) {
                 o << '\n';
                 o << "Individual " << i << ", fitness = " << m_rgcbPopulation[i]->m_iFitness << '\n';
                 o << "QueensPos: [";
