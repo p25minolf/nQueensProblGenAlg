@@ -8,7 +8,7 @@
 
 int main() {
 
-        Population* p = new Population(30, 8);
+        Population* p = new Population(100, 15);
         /*const char helpStr[] =
            "This is a Helperstr\n"
            "It is here to help.\n";

@@ -21,12 +21,19 @@ struct ChessBoard {
 	*/
 	ChessBoard::ChessBoard(size_t board)
 	{
-		boardSize = board;
-		m_rgQueenPositions = new int[boardSize];
+		m_boardSize = board;
+		m_rgQueenPositions = new int[m_boardSize];
 		m_iFitness = 0;
-		for (size_t i = 0; i < boardSize; i++) {
-			m_rgQueenPositions[i] = rand() % boardSize;
+		for (size_t i = 0; i < m_boardSize; i++) {
+			m_rgQueenPositions[i] = rand() % m_boardSize;
 		}
+	}
+
+	ChessBoard::ChessBoard(ChessBoard& rhs)
+	{
+		m_boardSize = rhs.m_boardSize;
+		m_rgQueenPositions = rhs.m_rgQueenPositions;
+		m_iFitness = rhs.m_iFitness;
 	}
 
 	ChessBoard::~ChessBoard()
@@ -34,7 +41,7 @@ struct ChessBoard {
 		delete m_rgQueenPositions;
 	}
         int m_iFitness;
-		size_t boardSize;
+		size_t m_boardSize;
 		int *m_rgQueenPositions;
 
 
@@ -58,17 +65,18 @@ struct ChessBoard {
  */
 ChessBoard **m_cbBestInd;
 const static size_t m_cMaxPopulation = 500;
-size_t boardSize;
+size_t m_boardSize;
 size_t m_cPopulationCount;
+size_t m_bestPop;
 ChessBoard **m_rgcbPopulation;
 
 public:
 Population(size_t, size_t);
 ~Population();
 void fnRateFitness();
-void fnGetBestInd();
 void fnMutatePop();
 void fnCrossoverPop();
+void fnInitCycle();
 virtual std::ostream& print(std::ostream& o) const;
 
 };
@@ -89,15 +97,18 @@ Population ::~Population() {
 Population ::Population(size_t ucInitialPopSize, size_t boardsize) {
         m_rgcbPopulation = new ChessBoard *[ucInitialPopSize]; //array initialize with ucInitialPopSize
         m_cPopulationCount = 0;
-		boardSize = boardsize;
+		m_boardSize = boardsize;
+
         std::cout << m_cPopulationCount << std::endl;
         for(size_t i = 0; i < ucInitialPopSize; i++) {
-                m_rgcbPopulation[i] = new ChessBoard(boardSize);
-                std::cout << m_rgcbPopulation[i]->m_iFitness << std::endl;
+                m_rgcbPopulation[i] = new ChessBoard(m_boardSize);
+               // std::cout << m_rgcbPopulation[i]->m_iFitness << std::endl;
                 //m_cPopulationCount++;
         }
         m_cPopulationCount = ucInitialPopSize;
-
+		m_bestPop = m_cPopulationCount / 4;
+		fnRateFitness();
+		fnInitCycle();
         std::cout << ucInitialPopSize << std::endl;
 }
 
@@ -111,8 +122,20 @@ void Population ::fnRateFitness() {
         for(size_t i = 0; i < m_cPopulationCount; i++) {
             std::cout << m_rgcbPopulation[i]->m_iFitness << std::endl;
             std::cout << i << std::endl;
-                m_rgcbPopulation[i]->fnCheckFitness();
+            m_rgcbPopulation[i]->fnCheckFitness();
         }
+		for (size_t i = 0; i < m_cPopulationCount; i++)
+		{
+			for (size_t j = i; j < m_cPopulationCount; j++)
+			{
+				if (m_rgcbPopulation[i]->m_iFitness < m_rgcbPopulation[j]->m_iFitness)
+				{
+					ChessBoard* temp = new ChessBoard(*m_rgcbPopulation[i]);
+					m_rgcbPopulation[i] = m_rgcbPopulation[j];
+					m_rgcbPopulation[j] = temp;
+				}
+			}
+		}
 
 }
 
@@ -123,8 +146,8 @@ void Population ::fnRateFitness() {
 int Population ::ChessBoard::fnCheckRow() {
         int i_cFitCountRow = 0;
 
-        for(size_t i = 0; i < boardSize; i++) {
-                for(size_t j = i+1; j < boardSize-i; j++) {
+        for(size_t i = 0; i < m_boardSize; i++) {
+                for(size_t j = i+1; j < m_boardSize-i; j++) {
                         if(m_rgQueenPositions[i] == m_rgQueenPositions[j]) {
                                 i_cFitCountRow++;
                         }
@@ -141,8 +164,8 @@ int Population ::ChessBoard::fnCheckRow() {
 int Population ::ChessBoard::fnCheckDiag() {
         int i_cFitCountDiag = 0;
 
-        for(size_t i = 0; i < boardSize; i++) {
-                for(size_t j = i+1; j < boardSize-i; j++) {
+        for(size_t i = 0; i < m_boardSize; i++) {
+                for(size_t j = i+1; j < m_boardSize-i; j++) {
                         if(m_rgQueenPositions[j] == m_rgQueenPositions[i]+j || m_rgQueenPositions[j] == m_rgQueenPositions[i]-j) {
                                 i_cFitCountDiag++;
                         }
@@ -153,9 +176,7 @@ int Population ::ChessBoard::fnCheckDiag() {
 }
 
  
-void Population ::fnGetBestInd() {
-    
-}
+
 
  
 void Population ::fnMutatePop() {
@@ -167,13 +188,23 @@ void Population ::fnCrossoverPop() {
 
 }
 
+void Population::fnInitCycle()
+{
+	while (m_rgcbPopulation[0]->m_iFitness < 0)
+	{
+		fnCrossoverPop();
+		fnMutatePop();
+		fnRateFitness();
+	}
+}
+
 std::ostream& Population ::print(std::ostream& o) const {
-        o << "Population, N = " << boardSize << ", popCount = " << m_cPopulationCount <<  '\n';
+        o << "Population, N = " << m_boardSize << ", popCount = " << m_cPopulationCount <<  '\n';
         for(size_t i = 0; i < m_cPopulationCount; i++) {
                 o << '\n';
                 o << "Individual " << i << ", fitness = " << m_rgcbPopulation[i]->m_iFitness << '\n';
                 o << "QueensPos: [";
-                for(size_t j = 0; j < boardSize; j++) {
+                for(size_t j = 0; j < m_boardSize; j++) {
                         o << m_rgcbPopulation[i]->m_rgQueenPositions[j] << ' ';
                 } o << ']' << '\n';
         }
