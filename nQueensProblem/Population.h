@@ -164,10 +164,11 @@ int Population ::ChessBoard::fnCheckDiag() {
         int i_cFitCountDiag = 0;
 
         for(size_t i = 0; i < m_boardSize; i++) {
-                for(size_t j = i+1; j < m_boardSize; j++) {
-                        if(m_rgQueenPositions[j] == m_rgQueenPositions[i]+j || m_rgQueenPositions[j] == m_rgQueenPositions[i]-j) {
-                                i_cFitCountDiag++;
-                        }
+                for(size_t j = 0; j < m_boardSize; j++) {
+						if (m_rgQueenPositions[i] == m_rgQueenPositions[j] + j  || m_rgQueenPositions[i] == m_rgQueenPositions[j] - j)
+						{
+						//	i_cFitCountDiag++; 
+						}
                 }
         }
 
@@ -188,7 +189,30 @@ void Population ::fnMutatePop() {
 
  
 void Population ::fnCrossoverPop() {
-	
+	for (size_t i = 0; i < m_cPopulationCount - m_bestPop; i++)
+	{
+		size_t rand1 = rand() % m_cPopulationCount;
+		size_t rand2 = rand() % m_boardSize;
+		if (rand2 > m_boardSize/2)
+		{
+			for (size_t j = m_boardSize; j > m_boardSize / 2; j--)
+			{
+				size_t temp = m_rgcbPopulation[i]->m_rgQueenPositions[j];
+				m_rgcbPopulation[i]->m_rgQueenPositions[j] = m_rgcbPopulation[rand1]->m_rgQueenPositions[j];
+				m_rgcbPopulation[rand1]->m_rgQueenPositions[j] = temp;
+			}
+			
+		}
+		else
+		{
+			for (size_t j = 0; j < m_boardSize / 2; j++)
+			{
+				size_t temp = m_rgcbPopulation[i]->m_rgQueenPositions[j];
+				m_rgcbPopulation[i]->m_rgQueenPositions[j] = m_rgcbPopulation[rand1]->m_rgQueenPositions[j];
+				m_rgcbPopulation[rand1]->m_rgQueenPositions[j] = temp;
+			}
+		}
+	}
 }
 
 void Population::fnInitCycle()
