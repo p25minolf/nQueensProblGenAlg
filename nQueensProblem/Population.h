@@ -20,7 +20,7 @@ struct ChessBoard {
 	/*
 	* Constructor - Randomizes position of queens
 	*/
-	ChessBoard::ChessBoard(size_t board)
+	ChessBoard(size_t board)
 	{
 		m_boardSize = board;
 		m_rgQueenPositions = new int[m_boardSize];
@@ -30,7 +30,7 @@ struct ChessBoard {
 		}
 	}
 
-	ChessBoard::~ChessBoard()
+	~ChessBoard()
 	{
 		delete m_rgQueenPositions;
 	}
@@ -111,16 +111,25 @@ void Population ::fnRateFitness() {
         for(size_t i = 0; i < m_cPopulationCount; i++) {
             m_rgcbPopulation[i]->fnCheckFitness();
         }
+		int min;
+		size_t nextmin;
 		for (size_t i = 0; i < m_cPopulationCount; i++)
 		{
+			min = m_rgcbPopulation[i]->m_iFitness;
+			nextmin = 0;
 			for (size_t j = i+1; j < m_cPopulationCount; j++)
 			{
-				if (m_rgcbPopulation[i]->m_iFitness > m_rgcbPopulation[j]->m_iFitness)
+				if (min > m_rgcbPopulation[j]->m_iFitness)
 				{
-					ChessBoard* temp = m_rgcbPopulation[i];
-					m_rgcbPopulation[i] = m_rgcbPopulation[j];
-					m_rgcbPopulation[j] = temp;
+					nextmin = j;
+					min = m_rgcbPopulation[j]->m_iFitness;
 				}
+			}
+			if (nextmin != 0)
+			{
+				ChessBoard* temp = m_rgcbPopulation[i];
+				m_rgcbPopulation[i] = m_rgcbPopulation[nextmin];
+				m_rgcbPopulation[nextmin] = temp;
 			}
 		}
 
@@ -231,10 +240,11 @@ void Population ::fnCrossoverPop() {
 
 void Population::fnInitCycle()
 {
+	srand(time(NULL));
 	int counter = 1;
 	while (m_rgcbPopulation[0]->m_iFitness > 0)
 	{
-		srand(time(NULL));
+
 		fnCrossoverPop();
 		fnMutatePop();
 		fnRateFitness();
@@ -249,7 +259,7 @@ void Population::fnInitCycle()
 
 std::ostream& Population ::print(std::ostream& o) const {
         o << "Population, N = " << m_boardSize << ", popCount = " << m_cPopulationCount <<  '\n';
-        for(size_t i = 0; i < 1; i++) {
+        for(size_t i = 0; i < 2; i++) {
                 o << '\n';
                 o << "Individual " << i << ", fitness = " << m_rgcbPopulation[i]->m_iFitness << '\n';
                 o << "QueensPos: [";
