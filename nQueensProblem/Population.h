@@ -169,8 +169,12 @@ void Population ::fnMutatePop() {
 
 	for (size_t i = m_bestPop; i < m_cPopulationCount; i++)
 	{
-		size_t randGen = rand() % m_boardSize;
-		m_rgcbPopulation[i]->m_rgQueenPositions[randGen] = rand() % m_boardSize;
+		int randDec = rand() % 2;
+		if (randDec == 0)
+		{
+			size_t randGen = rand() % m_boardSize;
+			m_rgcbPopulation[i]->m_rgQueenPositions[randGen] = rand() % m_boardSize;
+		}
 	}
 }
 
@@ -180,27 +184,45 @@ void Population ::fnCrossoverPop() {
 
 	for (size_t i = 0; i < m_cPopulationCount - m_bestPop; i++)
 	{
-		size_t rand1 = rand() % m_cPopulationCount;
-		size_t rand2 = rand() % m_boardSize;
-		if (rand2 > m_boardSize/2)
+		int dec = 1;
+		if (i < m_cPopulationCount / 4)
+			dec = rand() % 2;
+		else if (i < m_cPopulationCount / 2)
 		{
-			for (size_t j = m_boardSize; j > m_boardSize / 2; j--)
-			{
-				size_t temp = m_rgcbPopulation[i]->m_rgQueenPositions[j];
-				m_rgcbPopulation[i]->m_rgQueenPositions[j] = m_rgcbPopulation[rand1]->m_rgQueenPositions[j];
-				m_rgcbPopulation[rand1]->m_rgQueenPositions[j] = temp;
-			}
-			
+			dec = rand() % 3;
+		}
+		else if (i < m_cPopulationCount / 1.5)
+		{
+			dec = rand() % 5;
 		}
 		else
 		{
-			for (size_t j = 0; j < m_boardSize / 2; j++)
-			{
-				size_t temp = m_rgcbPopulation[i]->m_rgQueenPositions[j];
-				m_rgcbPopulation[i]->m_rgQueenPositions[j] = m_rgcbPopulation[rand1]->m_rgQueenPositions[j];
-				m_rgcbPopulation[rand1]->m_rgQueenPositions[j] = temp;
-			}
+			dec = 0;
 		}
+			if (dec == 1)
+			{
+				size_t rand1 = rand() % (m_cPopulationCount/2);
+				size_t rand2 = rand() % m_boardSize;
+				if (rand2 > m_boardSize / 2)
+				{
+					for (size_t j = m_boardSize; j > rand2; j--)
+					{
+						size_t temp = m_rgcbPopulation[i]->m_rgQueenPositions[j];
+						m_rgcbPopulation[i]->m_rgQueenPositions[j] = m_rgcbPopulation[rand1]->m_rgQueenPositions[j];
+						m_rgcbPopulation[rand1]->m_rgQueenPositions[j] = temp;
+					}
+
+				}
+				else
+				{
+					for (size_t j = rand2; j < m_boardSize / 2; j++)
+					{
+						size_t temp = m_rgcbPopulation[i]->m_rgQueenPositions[j];
+						m_rgcbPopulation[i]->m_rgQueenPositions[j] = m_rgcbPopulation[rand1]->m_rgQueenPositions[j];
+						m_rgcbPopulation[rand1]->m_rgQueenPositions[j] = temp;
+					}
+				}
+			}
 	}
 }
 
