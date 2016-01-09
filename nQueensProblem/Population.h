@@ -44,7 +44,7 @@ struct ChessBoard {
          * Function to set the fitness var
          */
         void fnCheckFitness() {
-			m_iFitness -= fnCheck();
+			m_iFitness = fnCheck();
         }
 
         int fnCheck();
@@ -97,10 +97,9 @@ Population ::Population(size_t ucInitialPopSize, size_t boardsize) {
                 //m_cPopulationCount++;
         }
         m_cPopulationCount = ucInitialPopSize;
-		m_bestPop = 2;
+		m_bestPop = m_cPopulationCount/6;
 		fnRateFitness();
 		fnInitCycle();
-        std::cout << ucInitialPopSize << std::endl;
 }
 
 /*
@@ -110,14 +109,13 @@ void Population ::fnRateFitness() {
 
 
         for(size_t i = 0; i < m_cPopulationCount; i++) {
-			m_rgcbPopulation[i]->m_iFitness = 0;
             m_rgcbPopulation[i]->fnCheckFitness();
         }
 		for (size_t i = 0; i < m_cPopulationCount; i++)
 		{
 			for (size_t j = i+1; j < m_cPopulationCount; j++)
 			{
-				if (m_rgcbPopulation[i]->m_iFitness < m_rgcbPopulation[j]->m_iFitness)
+				if (m_rgcbPopulation[i]->m_iFitness > m_rgcbPopulation[j]->m_iFitness)
 				{
 					ChessBoard* temp = m_rgcbPopulation[i];
 					m_rgcbPopulation[i] = m_rgcbPopulation[j];
@@ -185,7 +183,8 @@ void Population ::fnCrossoverPop() {
 	for (size_t i = 0; i < m_cPopulationCount - m_bestPop; i++)
 	{
 		int dec = 1;
-		if (i < m_cPopulationCount / 4)
+		if (i < m_bestPop);
+		else if (i < m_cPopulationCount / 4)
 			dec = rand() % 2;
 		else if (i < m_cPopulationCount / 2)
 		{
@@ -203,7 +202,7 @@ void Population ::fnCrossoverPop() {
 			{
 				size_t rand1 = rand() % (m_cPopulationCount/2);
 				size_t rand2 = rand() % m_boardSize;
-				if (rand2 > m_boardSize / 2)
+				/*if (rand2 > m_boardSize / 2)
 				{
 					for (size_t j = m_boardSize; j > rand2; j--)
 					{
@@ -221,7 +220,11 @@ void Population ::fnCrossoverPop() {
 						m_rgcbPopulation[i]->m_rgQueenPositions[j] = m_rgcbPopulation[rand1]->m_rgQueenPositions[j];
 						m_rgcbPopulation[rand1]->m_rgQueenPositions[j] = temp;
 					}
-				}
+				}*/
+				size_t rand3 = rand() % m_boardSize;
+				size_t temp = m_rgcbPopulation[i]->m_rgQueenPositions[rand3];
+				m_rgcbPopulation[i]->m_rgQueenPositions[rand3] = m_rgcbPopulation[rand1]->m_rgQueenPositions[rand3];
+				m_rgcbPopulation[rand1]->m_rgQueenPositions[rand3] = temp;
 			}
 	}
 }
@@ -229,15 +232,19 @@ void Population ::fnCrossoverPop() {
 void Population::fnInitCycle()
 {
 	int counter = 1;
-	while (m_rgcbPopulation[0]->m_iFitness < 0)
+	while (m_rgcbPopulation[0]->m_iFitness > 0)
 	{
 		srand(time(NULL));
 		fnCrossoverPop();
 		fnMutatePop();
 		fnRateFitness();
 		counter++;
+		if (counter % 1000 == 0)
+		{
+			std::cout << m_rgcbPopulation[0]->m_iFitness<<std::endl;
+		}
 	}
-	std::cout << "cycle: " << counter;
+	std::cout << "cycle: " << counter<<std::endl;
 }
 
 std::ostream& Population ::print(std::ostream& o) const {

@@ -8,8 +8,8 @@
 
 int main() {
 		
-	size_t n = 10;
-	size_t pop = n * 25;
+	size_t n = 8;
+	size_t pop = 1000;// n * 25;
         Population* p = new Population(pop, n);
 
         p->print(std::cout);
