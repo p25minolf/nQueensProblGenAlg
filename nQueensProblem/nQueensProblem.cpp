@@ -28,7 +28,7 @@ int main() {
 		}
 
 
-		size_t pop =  n * 50;
+		size_t pop =  200;
 		Population* p = new Population(pop, n);
 
 		p->print(std::cout);

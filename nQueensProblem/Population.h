@@ -64,7 +64,7 @@ public:
 	~Population();
 	void fnRateFitness();
 	void fnMutatePop();
-	void fnCrossoverPop();
+	size_t fnCrossoverPop(size_t);
 	void fnInitCycle();
 	virtual std::ostream& print(std::ostream& o) const;
 
@@ -118,6 +118,23 @@ void Population::fnRateFitness() {
 			m_rgcbPopulation[j] = m_rgcbPopulation[j-1];
 			m_rgcbPopulation[j-1] = temp;
 			j--;
+			if (j - 1 == 0)
+			{
+				if (m_rgcbPopulation[0]->m_iFitness == 0)
+					return;
+			}
+		}
+	}
+	for (size_t i = m_cPopulationCount*0.8; i < m_cPopulationCount; i++)
+	{
+		delete m_rgcbPopulation[i];
+		m_rgcbPopulation[i] = new ChessBoard(m_boardSize);
+		m_rgcbPopulation[i]->fnCheckFitness();
+		if (m_rgcbPopulation[i]->m_iFitness < m_rgcbPopulation[0]->m_iFitness)
+		{
+			ChessBoard* temp = m_rgcbPopulation[0];
+			m_rgcbPopulation[0] = m_rgcbPopulation[i];
+			m_rgcbPopulation[i] = temp;
 		}
 	}
 
@@ -164,7 +181,7 @@ void Population::fnMutatePop() {
 
 	for (size_t i = m_bestPop; i < m_cPopulationCount; i++)
 	{
-		int randDec = rand() % 2;
+		int randDec = rand() % 10;
 		if (randDec == 0)
 		{
 			size_t randGen = rand() % m_boardSize;
@@ -174,73 +191,52 @@ void Population::fnMutatePop() {
 }
 
 
-void Population::fnCrossoverPop() {
-	for (size_t i = 1; i < m_cPopulationCount - m_bestPop; i++)
+size_t Population::fnCrossoverPop(size_t newPop) {
+	size_t limit = m_cPopulationCount*0.8;
+	for (size_t i = 0; i < limit; i++)
 	{
+		if (newPop == m_cPopulationCount)
+			return newPop;
 		int dec = 1;
 		if (i < m_bestPop);
-		else if (i < m_cPopulationCount / 8)
+		else if (i < m_cPopulationCount / 4)
 		{
 			dec = rand() % 2;
 		}
-		else if (i < m_cPopulationCount / 4)
+		else if (i < m_cPopulationCount / 2)
 		{
 			dec = rand() % 3;
 		}
-		else if (i < m_cPopulationCount / 2)
+		else if (i < m_cPopulationCount *0.8)
 		{
 			dec = rand() % 6;
 		}
-		else if (i < m_cPopulationCount / 1.5)
-		{
-			dec = rand() % 8;
-		}
 		else
 		{
-			dec = rand() % 12;
+			dec = rand() % 10;
 		}
 		if (dec == 1)
 		{
-			size_t rand1 = rand() % (m_cPopulationCount - m_bestPop);
-			size_t rand2 = rand() % m_boardSize;
-			if (rand2 > m_boardSize / 2)
+			size_t randIndiv = rand() % limit/2;
+			size_t randBorder = rand() % m_boardSize;
+			for (size_t j = 0; j < m_boardSize; j++)
 			{
-				for (size_t j = m_boardSize; j > rand2; j--)
+				if (j <= randBorder)
 				{
-					size_t rand3 = rand() % m_boardSize;
-					if (rand1 != 0)
-					{
-						size_t temp = m_rgcbPopulation[i]->m_rgQueenPositions[rand3];
-						m_rgcbPopulation[i]->m_rgQueenPositions[rand3] = m_rgcbPopulation[rand1]->m_rgQueenPositions[rand3];
-						m_rgcbPopulation[rand1]->m_rgQueenPositions[rand3] = temp;
-					}
-					else
-					{
-						m_rgcbPopulation[i]->m_rgQueenPositions[rand3] = m_rgcbPopulation[rand1]->m_rgQueenPositions[rand3];
-					}
+					m_rgcbPopulation[newPop]->m_rgQueenPositions[j] = m_rgcbPopulation[i]->m_rgQueenPositions[j];
+				}
+				else
+				{
+					m_rgcbPopulation[newPop]->m_rgQueenPositions[j] = m_rgcbPopulation[randIndiv]->m_rgQueenPositions[j];
+				}
 
-				}
 			}
-			else
-			{
-				for (size_t j = rand2; j < m_boardSize / 2; j++)
-				{
-					size_t rand3 = rand() % m_boardSize;
-					if (rand1 != 0)
-					{
-						size_t temp = m_rgcbPopulation[i]->m_rgQueenPositions[rand3];
-						m_rgcbPopulation[i]->m_rgQueenPositions[rand3] = m_rgcbPopulation[rand1]->m_rgQueenPositions[rand3];
-						m_rgcbPopulation[rand1]->m_rgQueenPositions[rand3] = temp;
-					}
-					else
-					{
-						m_rgcbPopulation[i]->m_rgQueenPositions[rand3] = m_rgcbPopulation[rand1]->m_rgQueenPositions[rand3];
-					}
-				}
-			}
+			newPop++;
+			
 
 		}
 	}
+	return newPop;
 }
 
 void Population::fnInitCycle()
@@ -249,13 +245,18 @@ void Population::fnInitCycle()
 	int counter = 1;
 	while (m_rgcbPopulation[0]->m_iFitness > 0)
 	{
-		fnCrossoverPop();
+		size_t newPop = 0;
+		while (newPop < m_cPopulationCount)
+		{
+			newPop=fnCrossoverPop(newPop);
+
+		}
 		fnMutatePop();
 		fnRateFitness();
 		counter++;
-		if (counter % 5000 == 0)
+		if (counter % 500 == 0)
 		{
-			std::cout << "Best current fitness (after 5000 generations):  " << m_rgcbPopulation[0]->m_iFitness << std::endl;
+			std::cout << "Best current fitness (after "<<counter<< " generations):  " << m_rgcbPopulation[0]->m_iFitness << "   "<<m_rgcbPopulation[1]->m_iFitness<<std::endl;
 		}
 	}
 	std::cout <<std::endl<< "Generation: " << counter << std::endl<<std::endl;
