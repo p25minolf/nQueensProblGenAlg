@@ -125,18 +125,7 @@ void Population::fnRateFitness() {
 			}
 		}
 	}
-	for (size_t i = m_cPopulationCount*0.8; i < m_cPopulationCount; i++)
-	{
-		delete m_rgcbPopulation[i];
-		m_rgcbPopulation[i] = new ChessBoard(m_boardSize);
-		m_rgcbPopulation[i]->fnCheckFitness();
-		if (m_rgcbPopulation[i]->m_iFitness < m_rgcbPopulation[0]->m_iFitness)
-		{
-			ChessBoard* temp = m_rgcbPopulation[0];
-			m_rgcbPopulation[0] = m_rgcbPopulation[i];
-			m_rgcbPopulation[i] = temp;
-		}
-	}
+	
 
 }
 
@@ -199,7 +188,7 @@ size_t Population::fnCrossoverPop(size_t newPop) {
 			return newPop;
 		int dec = 1;
 		if (i < m_bestPop);
-		else if (i < m_cPopulationCount / 4)
+		else if (i < (m_cPopulationCount+newPop) / 4)
 		{
 			dec = rand() % 2;
 		}
@@ -256,7 +245,8 @@ void Population::fnInitCycle()
 		counter++;
 		if (counter % 500 == 0)
 		{
-			std::cout << "Best current fitness (after "<<counter<< " generations):  " << m_rgcbPopulation[0]->m_iFitness << "   "<<m_rgcbPopulation[1]->m_iFitness<<std::endl;
+			std::cout << "Best current fitness (after "<<counter<< " generations):  " << m_rgcbPopulation[0]->m_iFitness <<std::endl;
+
 		}
 	}
 	std::cout <<std::endl<< "Generation: " << counter << std::endl<<std::endl;
