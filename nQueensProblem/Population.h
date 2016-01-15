@@ -168,9 +168,9 @@ int Population::ChessBoard::fnCheck() {
 void Population::fnMutatePop() {
 
 
-	for (size_t i = m_bestPop; i < m_cPopulationCount; i++)
+	for (size_t i = 0; i < m_cPopulationCount; i++)
 	{
-		int randDec = rand() % 10;
+		int randDec = rand() % 5;
 		if (randDec == 0)
 		{
 			size_t randGen = rand() % m_boardSize;
